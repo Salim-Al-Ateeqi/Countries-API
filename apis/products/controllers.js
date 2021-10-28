@@ -1,43 +1,67 @@
+const Product = require("../../models/Product");
 const ProductSchema = require("../../models/Product");
 
-const fetchProductList = async (req, res) => {
+const createProduct = async (req, res, next) => {
+  try {
+    const createdProduct = await ProductSchema.create(req.body);
+    return res.status(201).json(createdProduct);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const fetchProductList = async (req, res, next) => {
   try {
     const products = await ProductSchema.find();
 
     res.json(products);
   } catch (error) {
-    return res.status(500).json({ message: "List Error" });
+    next(error);
   }
 };
 
-const createProduct = async (req, res) => {
+const updateProduct = async (req, res, next) => {
+  const { productId } = req.params;
   try {
-    const createdProduct = await ProductSchema.create(req.body);
-    return res.status(201).json(createdProduct);
-  } catch (error) {
-    return res.status(500).json({ message: "Create Error" });
-  }
-};
-
-// const updateProduct =
-
-const deleteProduct = async (req, res) => {
-  try {
-    const foundproduct = await ProductSchema.findById(req.params.productId);
-    console.log(
-      "🚀 ~ file: controllers.js ~ line 26 ~ deleteProduct ~ foundproduct",
-      foundproduct
+    const product = await ProductSchema.findByIdAndUpdate(
+      { _id: productId },
+      req.body,
+      { new: true, runValidators: true }
     );
-
-    if (foundproduct) {
-      foundproduct.remove();
-      return res.status(204).end();
+    if (product) {
+      return res.json(product);
     } else {
-      return res.status(404).json({ message: "Product not found!" });
+      next({
+        status: 404,
+        message: "Product not found!",
+      });
     }
   } catch (error) {
-    return res.status(500).json({ message: "Delete Error" });
+    next(error);
   }
 };
 
-module.exports = { fetchProductList, createProduct, deleteProduct };
+const deleteProduct = async (req, res, next) => {
+  try {
+    const { productId } = req.params;
+    const product = await Product.findByIdAndDelete({ _id: productId });
+
+    if (product) {
+      return res.status(204).end();
+    } else {
+      next({
+        status: 404,
+        message: "Product not found!",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  createProduct,
+  fetchProductList,
+  updateProduct,
+  deleteProduct,
+};
