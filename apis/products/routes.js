@@ -4,9 +4,14 @@ const {
   createProduct,
   deleteProduct,
   updateProduct,
+  fetchProduct,
 } = require("./controllers");
 
 const router = express.Router();
+
+router.param("productId", async (req, res, next, productId) => {
+  product = fetchProduct(productId, next);
+});
 
 router.post("/", createProduct);
 

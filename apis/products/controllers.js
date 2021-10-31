@@ -1,7 +1,16 @@
 const Product = require("../../models/Product");
 const ProductSchema = require("../../models/Product");
 
-const createProduct = async (req, res, next) => {
+const fetchProduct = async (productId, next) => {
+  try {
+    const product = await Product.findById(productId);
+    return product;
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.exports.createProduct = async (req, res, next) => {
   try {
     const createdProduct = await ProductSchema.create(req.body);
     return res.status(201).json(createdProduct);
@@ -10,7 +19,7 @@ const createProduct = async (req, res, next) => {
   }
 };
 
-const fetchProductList = async (req, res, next) => {
+exports.fetchProductList = async (req, res, next) => {
   try {
     const products = await ProductSchema.find();
 
@@ -20,7 +29,7 @@ const fetchProductList = async (req, res, next) => {
   }
 };
 
-const updateProduct = async (req, res, next) => {
+exports.updateProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
     const product = await ProductSchema.findByIdAndUpdate(
@@ -41,7 +50,7 @@ const updateProduct = async (req, res, next) => {
   }
 };
 
-const deleteProduct = async (req, res, next) => {
+exports.deleteProduct = async (req, res, next) => {
   try {
     const { productId } = req.params;
     const product = await Product.findByIdAndDelete({ _id: productId });
@@ -57,11 +66,4 @@ const deleteProduct = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-
-module.exports = {
-  createProduct,
-  fetchProductList,
-  updateProduct,
-  deleteProduct,
 };
