@@ -33,18 +33,11 @@ exports.updateProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
     const product = await ProductSchema.findByIdAndUpdate(
-      { _id: productId },
+      { _id: req.product.id },
       req.body,
       { new: true, runValidators: true }
     );
-    if (product) {
-      return res.json(product);
-    } else {
-      next({
-        status: 404,
-        message: "Product not found!",
-      });
-    }
+    res.status(204).end();
   } catch (error) {
     next(error);
   }
@@ -52,17 +45,8 @@ exports.updateProduct = async (req, res, next) => {
 
 exports.deleteProduct = async (req, res, next) => {
   try {
-    const { productId } = req.params;
-    const product = await Product.findByIdAndDelete({ _id: productId });
-
-    if (product) {
-      return res.status(204).end();
-    } else {
-      next({
-        status: 404,
-        message: "Product not found!",
-      });
-    }
+    await req.Product.remove();
+    res.status(204).end();
   } catch (error) {
     next(error);
   }
