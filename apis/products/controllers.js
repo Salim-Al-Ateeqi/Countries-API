@@ -10,7 +10,7 @@ const fetchProduct = async (productId, next) => {
   }
 };
 
-exports.exports.createProduct = async (req, res, next) => {
+exports.createProduct = async (req, res, next) => {
   try {
     const createdProduct = await ProductSchema.create(req.body);
     return res.status(201).json(createdProduct);
